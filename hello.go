@@ -306,6 +306,13 @@ func DemoTest04() {
 	fmt.Println("demo04的string:", demo04.string)
 }
 
+func StructApp(msg *struct {
+	name string
+	age  int
+}) {
+	fmt.Println((*msg).age) //相当于msg.age结构体（无论匿名还是命名）自动帮忙解引用
+}
+
 /*
 嵌套结构体
 */
@@ -358,7 +365,28 @@ func DemoTest06() {
  但是将结构体类型设为方法的接收体类型（若想通过方法修改传入的接收体参数的值需要传入指针(demo *Demo)（即传入要修改的结构体对象的地址（&）））
 */
 
+type Cat struct {
+	color string
+	name  string
+}
+
+//返回值为Cat的话，返回的是一个Cat结构体
+//相当于是将该Cat里的color和name属性复制一份给了main里的接收结构体Cat（即有两个结构体，main里面的Cat和create函数里的Cat是两个不同的结构体（地址不同），只是这两个结构体的属性的值相同而已（因为main里Cat的属性值，是用create里的Cat的属性值复制过去的））
+//返回值为*Cat的话，返回的是Cat结构体的地址（即指针）,
+//main函数里的接收结构体接收到的是这个结构体的地址（即只有一份Cat结构体，main里面的Cat是指针保存的是create函数里的Cat的地址）
+func catCreate(col string) Cat {
+	cat := Cat{
+		color: col}
+	fmt.Printf("true address is %p\n", &cat)
+	return cat
+}
+
 func main() {
+	/*
+		cat := catCreate("wihte")
+		fmt.Printf("true address is %p\n", &cat)
+		fmt.Println("cat's color is", cat.color)
+	*/
 	//test01()
 	//test02()
 	//test03()
@@ -387,5 +415,5 @@ func main() {
 	*/
 	//DemoTest04()
 	//DemoTest05()
-	DemoTest06()
+	//DemoTest06()
 }
