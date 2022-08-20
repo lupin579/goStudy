@@ -381,7 +381,118 @@ func catCreate(col string) Cat {
 	return cat
 }
 
+/*
+接口
+*/
+type Ark interface {
+	Dark(time int) string
+	Dawn(time int) string
+}
+
+type Hat interface {
+	Dark(time int) string
+	Dawn(time int) string
+}
+
+type day struct {
+	ark Ark
+}
+
+func (d *day) Dark(time int) string {
+	fmt.Println("it is nighttime now!")
+	return "dark time"
+}
+
+func (d *day) Dawn(time int) string {
+	fmt.Println("it is daytime now!")
+	return "light time"
+}
+
+func interDemo01() {
+	d := new(day)
+	var ark Ark = d
+	fmt.Printf("%p\n", &ark) //除该行外，其余行地址均为0xc000088220（由此可见，创建新的接口类型是申请一块新的内存将结构体指针转换为对应接口类型后存入该内存中）
+	d.ark = d
+	d.ark.Dark(3)
+	fmt.Printf("%p\n", d)
+	fmt.Printf("%p\n", &(d.ark)) //创建一个结构体后，所有属性均存放在该地址中
+	fmt.Printf("%p\n", d)
+	//ark.Dawn(3)
+}
+
+/*
+接口（类型断言）
+首先创建一个实现接口方法的结构体的指针
+再将该指针赋值给一个interface{}类型的变量（即将结构体的指针类型转换为接口类型（当该结构体指针实现了接口的所有方法时即可完成转换））
+再使用类型断言obj.(T)——obj为转换后的接口类型，T为将要转换为的类型（有两个返回值：转换为的类型变量，是否转换成功）（只有转换前的obj实现了T接口的所有方法才可以转换成功）
+通过接收转换后的接口类型即可使用接收体对这个接口类型的方法进行操作
+*/
+type Flyer interface {
+	Fly()
+}
+
+type Walker interface {
+	Walk()
+}
+
+type Bird struct {
+}
+
+type Pig struct {
+}
+
+func (bird *Bird) Fly() {
+	fmt.Println("bird can fly")
+}
+
+func (bird *Bird) Walk() {
+	fmt.Println("bird can walk")
+}
+
+func (pig *Pig) Walk() {
+	fmt.Println("pig can walk")
+}
+
+func interDemo() {
+	/*
+		animals :=map[string]interface{}{
+			"bird":new(Bird),
+			"pig":new(Pig),
+		}
+	*/
+	//	for name,obj:=range animals{
+	//
+	//	}
+	var obj interface{} = new(Pig)
+	fly, isFlyer := obj.(Flyer)
+	if isFlyer {
+		fly.Fly()
+	}
+	walk, isWalker := obj.(Walker)
+	if isWalker {
+		walk.Walk()
+	}
+	walkA, isWalkerA := obj.(Walker)
+	if isWalkerA {
+		walkA.Walk()
+	}
+	var objB interface{} = new(Bird)
+	flyB, isFlyerB := objB.(Flyer)
+	if isFlyerB {
+		flyB.Fly()
+	}
+	walkB, isWalkerB := objB.(Walker)
+	if isWalkerB {
+		walkB.Walk()
+	}
+}
+
 func main() {
+	interDemo01()
+	/*
+		f := catCreate//将函数当做值传递给一个变量（相当与给函数起了一个别名）调用时f()和catCreate()都可以调用该方法
+		f("sss")
+	*/
 	/*
 		cat := catCreate("wihte")
 		fmt.Printf("true address is %p\n", &cat)
